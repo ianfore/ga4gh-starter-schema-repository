@@ -16,7 +16,7 @@ It is not an attempt to produce a production implementation of the standard.
 
 
 ### Notebooks
- Jupyter notebooks demonstrating use of this implementation and the schema sources currently covered are available at [FASP Search](https://github.com/ga4gh/fasp-scripts/tree/master/notebooks/search)
+ Jupyter notebooks demonstrating use of this implementation and the schema sources currently covered are available at [FASP Search](https://github.com/ga4gh/fasp-scripts/tree/master/notebooks/schema-registry)
  
 ### Included code
 The files included in the com.dnastack.ga4gh.dataconnect package and its sub-packages are from the https://github.com/DNAstack/data-connect-trino repository and subject to the license present in that repository.
