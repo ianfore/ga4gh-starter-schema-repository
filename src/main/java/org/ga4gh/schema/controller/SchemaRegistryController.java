@@ -76,7 +76,7 @@ public class SchemaRegistryController {
      return(response);
   }
   
-  @GetMapping("/schemas/{namespace}/")
+  @GetMapping("/schemas/{namespace}")
   SchemaResponse getSchemas(@PathVariable String namespace,
 		  @RequestParam(required = false) String study,
 		  @RequestParam(required = false) String study_version,
