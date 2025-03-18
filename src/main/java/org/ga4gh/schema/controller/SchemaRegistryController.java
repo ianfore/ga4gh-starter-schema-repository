@@ -67,7 +67,7 @@ public class SchemaRegistryController {
   }
   
   @GetMapping("/schemas/{namespace}/{schema_name}/versions/latest")
-  DataModel getLatestSchema(@PathVariable String namespace, @PathVariable String schema_name, @PathVariable String semantic_version) {
+  DataModel getLatestSchema(@PathVariable String namespace, @PathVariable String schema_name) {
 	  
 	  DataModel model = manager.getProvider(namespace).supplySchema(schema_name);
 	  return model;
