@@ -34,7 +34,8 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.ga4gh.schema.dbgap.dict.*;
-import org.ga4gh.schema.model.Schema;  
+import org.ga4gh.schema.model.Schema;
+import org.ga4gh.schema.model.SchemaVersion;  
 
 @Slf4j
 //@Configuration
@@ -301,4 +302,10 @@ public class DbGaPSchemaProvider implements SchemaProvider {
         }
         return studypath + "/" + dirName + "/pheno_variable_summaries/"; 
     }
+
+	@Override
+	public List<SchemaVersion> getSchemaVersions(String schema) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 } 

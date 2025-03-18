@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.ga4gh.schema.model.NamespaceResponse;
 import org.ga4gh.schema.model.Schema;
 import org.ga4gh.schema.model.SchemaResponse;
+import org.ga4gh.schema.model.SchemaVersion;
+import org.ga4gh.schema.model.SchemaVersionsResponse;
 import org.ga4gh.schema.provider.SchemaManager;
 import org.ga4gh.schema.provider.SchemaProvider;
 
@@ -64,6 +66,15 @@ public class SchemaRegistryController {
 	    //  .orElseThrow(() -> new SchemaNotFoundException(id));
   }
   
+  @GetMapping("/schemas/{namespace}/{schema_name}/versions/latest")
+  DataModel getLatestSchema(@PathVariable String namespace, @PathVariable String schema_name, @PathVariable String semantic_version) {
+	  
+	  DataModel model = manager.getProvider(namespace).supplySchema(schema_name);
+	  return model;
+	    //return provider.findById(id)
+	    //  .orElseThrow(() -> new SchemaNotFoundException(id));
+  }
+  
   @GetMapping("/dictionaries/{schema_name}/{schema_version}")
   SchemaResponse dictSchemas(@PathVariable String namespace,
 		  @PathVariable String schema_name,
@@ -75,7 +86,7 @@ public class SchemaRegistryController {
      SchemaResponse response= new SchemaResponse("dbGaP", schemas);
      return(response);
   }
-  
+   
   @GetMapping("/schemas/{namespace}/")
   SchemaResponse getSchemas(@PathVariable String namespace,
 		  @RequestParam(required = false) String study,
@@ -95,4 +106,17 @@ public class SchemaRegistryController {
 	 SchemaResponse response= new SchemaResponse(namespace, schemas);
 	 return(response);
   }
+
+
+	@GetMapping("/schemas/{namespace}/{schema_name}/versions/")
+	SchemaVersionsResponse getSchemaVersions(@PathVariable String namespace, @PathVariable String schema_name) {
+	  
+	   log.debug("namespace is  " + namespace);
+	   SchemaProvider provider = manager.getProvider(namespace);
+	   log.debug("schema provider class  is  " + provider.getClass().getName());
+	   String studyString = "";
+	   List<SchemaVersion> versions = provider.getSchemaVersions(studyString);
+		 SchemaVersionsResponse response= new SchemaVersionsResponse(schema_name, versions);
+		 return(response);
+	}
 }

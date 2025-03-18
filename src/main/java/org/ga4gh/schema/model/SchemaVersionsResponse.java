@@ -1,6 +1,6 @@
 package org.ga4gh.schema.model;
 
-import java.util.Objects;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -14,20 +14,18 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 //@JsonView(SerializeView.Public.class)
-public class Namespace {
+public class SchemaVersionsResponse {
 
-	  private String namespaceName;
-	  private String latestVersion;
-	  private String contact_url;
+	  private String schemaName;
+	  private List<SchemaVersion> versions;
+
 	  
-	Namespace() {}
+	public SchemaVersionsResponse(String schemaName, List<SchemaVersion> versions) {
 
-	public Namespace(String name, String contact_url, String latestVersion) {
+	    this.schemaName = schemaName;
+	    this.versions = versions;
 
-	    this.namespaceName = name;
-	    this.latestVersion = latestVersion;
-    this.contact_url = contact_url;
   }
-
-
 }
+
+

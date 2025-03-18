@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ga4gh.schema.model.Schema;
+import org.ga4gh.schema.model.SchemaVersion;
 
 import com.dnastack.ga4gh.dataconnect.DataModelSupplier;
 import com.dnastack.ga4gh.dataconnect.model.DataModel;
@@ -99,5 +100,11 @@ public class FileDataModelSupplier implements DataModelSupplier, SchemaProvider 
             }
         }
         return model;
+	}
+
+	@Override
+	public List<SchemaVersion> getSchemaVersions(String schema) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
