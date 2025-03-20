@@ -17,7 +17,7 @@ public class SchemaManager {
 	    providers = new HashMap<>();
 	    namespaces = new ArrayList<>();
 	    
-		Namespace ns1 = new Namespace("dbGaP", "https://ncbi.nlm.gov", "1.0.0");
+		Namespace ns1 = new Namespace("dbGaP", "https://ncbi.nlm.gov");
 		providers.put(ns1.getNamespaceName(), new DbGaPSchemaProvider());
 		
 		Namespace ns2 = new Namespace("gks-core", "https://github.com/ga4gh/gks-core", "1.0.0");
@@ -26,10 +26,10 @@ public class SchemaManager {
 		Namespace ns5 = new Namespace("vrs", "https://github.com/ga4gh/vrs", "2.0.0");
 		providers.put(ns5.getNamespaceName(), new GitHubSchemaProvider("ga4gh/vrs", "schema/vrs/json"));
 		
-		Namespace ns3 = new Namespace("dataconnect-demo", "https://localhost", "1.0.0");
+		Namespace ns3 = new Namespace("dataconnect-demo", "https://localhost");
 		providers.put(ns3.getNamespaceName(), new FileDataModelSupplier("/models"));
 		
-		Namespace ns4 = new Namespace("expt-metadata", "https://localhost", "1.0.0");
+		Namespace ns4 = new Namespace("expt-metadata", "https://localhost");
 		providers.put(ns4.getNamespaceName(), new FileDataModelSupplier("/sra_schemas"));
 		
 	    namespaces.add(ns1);
