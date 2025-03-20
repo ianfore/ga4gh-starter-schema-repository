@@ -14,18 +14,17 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 //@JsonView(SerializeView.Public.class)
-public class SchemaVersionsResponse {
+public class ReturnTypesResponse {
 
-	  private String schemaName;
-	  private List<SchemaVersion> versions;
+	  private String namespace;
+	  private List<String> returnTypes;
 
 	  
-	public SchemaVersionsResponse(String schemaName, List<SchemaVersion> versions) {
+	public ReturnTypesResponse(String namespace, List<String> returnTypes) {
 
-	    this.schemaName = schemaName;
-	    this.versions = versions;
+	    this.namespace = namespace;
+	    this.returnTypes = returnTypes;
 
   }
 }
-
 

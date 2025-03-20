@@ -18,4 +18,6 @@ public interface SchemaProvider {
 
 	List<SchemaVersion> getSchemaVersions(String schema);
 
+	List<String> getReturnTypes();
+
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,7 +15,9 @@ import com.dnastack.ga4gh.dataconnect.model.DataModel;
 import lombok.extern.slf4j.Slf4j;
 
 import org.ga4gh.schema.model.NamespaceResponse;
+import org.ga4gh.schema.model.ReturnTypesResponse;
 import org.ga4gh.schema.model.Schema;
+import org.ga4gh.schema.model.SchemaRegistryServiceInfo;
 import org.ga4gh.schema.model.SchemaResponse;
 import org.ga4gh.schema.model.SchemaVersion;
 import org.ga4gh.schema.model.SchemaVersionsResponse;
@@ -26,6 +29,7 @@ import org.ga4gh.schema.provider.SchemaProvider;
 public class SchemaRegistryController {
 
   private SchemaManager manager;
+  
 
   SchemaRegistryController() {    
     manager = new SchemaManager();
@@ -119,4 +123,19 @@ public class SchemaRegistryController {
 		 SchemaVersionsResponse response= new SchemaVersionsResponse(schema_name, versions);
 		 return(response);
 	}
+	
+	@GetMapping("/schematypes/{namespace}")
+	ReturnTypesResponse getReturnTypes(@PathVariable String namespace) {
+	  
+	   SchemaProvider provider = manager.getProvider(namespace);
+	   List<String> types = provider.getReturnTypes();
+	   ReturnTypesResponse response= new ReturnTypesResponse(namespace, types);
+		return(response);
+	}
+	
+    @GetMapping("/service-info")
+    public org.ga4gh.schema.model.SchemaRegistryServiceInfo getServiceInfo() {
+    	SchemaRegistryServiceInfo serviceInfo = new SchemaRegistryServiceInfo();
+    	return serviceInfo;
+    }
 }

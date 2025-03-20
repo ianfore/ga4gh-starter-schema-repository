@@ -23,7 +23,7 @@ import org.kohsuke.github.PagedIterable;
 import com.dnastack.ga4gh.dataconnect.model.DataModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class GitHubSchemaProvider implements SchemaProvider {
+public class GitHubSchemaProvider extends BaseSchemaProvider implements SchemaProvider {
 
 	private String repository;
 	private List<String> schemaPaths;
@@ -143,4 +143,10 @@ public class GitHubSchemaProvider implements SchemaProvider {
 	  }
 	  return status;
 	}
+	
+	/*public List<String> getReturnTypes() {
+		List<String> returnTypes = Arrays.asList("json");
+		return returnTypes;
+	}*/
+
 }
