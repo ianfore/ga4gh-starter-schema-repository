@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +30,14 @@ import jakarta.xml.bind.Unmarshaller;
 
 import lombok.extern.slf4j.Slf4j;
 
-
-import org.apache.commons.net.ftp.FTPClient; 
+import org.apache.commons.net.PrintCommandListener;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.ga4gh.schema.dbgap.dict.*;
-import org.ga4gh.schema.model.Schema;  
+import org.ga4gh.schema.model.Schema;
+import org.ga4gh.schema.model.SchemaVersion;  
 
 @Slf4j
 //@Configuration
@@ -58,7 +61,7 @@ public class DbGaPSchemaProvider implements SchemaProvider {
     	this.pattern = Pattern.compile(".*\\.(pht\\d*\\.v\\d*)\\..*");
     	
     	// don't connect to FTP until needed, but instantiate a client
-    	ftp = new FTPClient();;
+    	ftp = new FTPClient();
     }
     
     // get map of table names to model URLs. The map is in /models
@@ -88,16 +91,16 @@ public class DbGaPSchemaProvider implements SchemaProvider {
     }
 
     private BufferedReader getDictReader(String tableName) {
-    	log.info("Retrieving schema for " + tableName);
+    	log.debug("Retrieving schema for " + tableName);
     	DataDict dict = new DataDict(tableName);
     	log.debug(dict.getPht());
     	String pht_name = dict.getPht();
-    	log.info("pht is " + pht_name );
-    	log.info("looking for version folder for " + dict.getStudy() + "." + dict.getStudyVersion() );
+    	log.debug("pht is " + pht_name );
+    	log.debug("looking for version folder for " + dict.getStudy() + "." + dict.getStudyVersion() );
     	String folder = findFolder(dict.getStudy() + "." + dict.getStudyVersion() );
     	String dictPath = folder + tableName + ".data_dict.xml";
     	
-    	log.info("Schema path is " + dictPath);
+    	log.debug("Schema path is " + dictPath);
     	BufferedReader reader = null;
     	try{
             URL url = new URL(this.base + dictPath);
@@ -208,16 +211,21 @@ public class DbGaPSchemaProvider implements SchemaProvider {
     //@Override
 	public List<DataDict> getDictionaries(String studyVersion) 
     { 
-    	List<DataDict> dicts = new ArrayList<>();
+		log.debug("looking for files for " + studyVersion);
+		List<DataDict> dicts = new ArrayList<>();
     	try {
-    		if  (!ftp.isConnected()) getFTPClient();
-    		if (this.ftp.isConnected()) { 
-                String studypath = "/dbgap/studies/" + studyVersion + "/pheno_variable_summaries/";
-                log.debug("looking for files in " + studypath);
-                String[] filesFTP = ftp.listNames(studypath);
+        	if  (!hasFTP()) {
+    			getFTPClient();
+    		}
+
+            String studypath = "/dbgap/studies/" + studyVersion + "/pheno_variable_summaries/";
+            log.debug("looking for files in " + studypath);
+            String[] filesFTP = ftp.listNames(studypath);
+            if (filesFTP != null) {
                 log.debug("found file count: " + filesFTP.length);
                 for (String filePath : filesFTP) { 
-                    if (filePath.endsWith("data_dict.xml")) {
+                	//log.debug("found file: " + filePath);
+                	if (filePath.endsWith("data_dict.xml")) {
                     	String[] parts = filePath.split("/");
                     	String phtString = parts[parts.length - 1];
                     	phtString = phtString.replace(".data_dict.xml", "");
@@ -225,8 +233,10 @@ public class DbGaPSchemaProvider implements SchemaProvider {
                     	DataDict dict = new DataDict(phtString);
                     	dicts.add(dict);
                     }
-                } 
-            } 
+                }                 	
+            }
+            else log.info("Not found: " + studypath);
+             
         } 
         catch (IOException e) { 
             e.printStackTrace(); 
@@ -240,17 +250,41 @@ public class DbGaPSchemaProvider implements SchemaProvider {
 	public List<Schema> getSchemas(String studyVersion) {
 
 		List<Schema> schemas = new ArrayList<>();
-		List<DataDict> dictionaries = getDictionaries(studyVersion);
 		List<String> maintainers = Arrays.asList("dbGaP");
-		for (DataDict dict : dictionaries) {
-			 schemas.add(new Schema(dict.getDictFullName(), dict.getVersion(),  maintainers, "released"));
-		  }
+		if (studyVersion != null && studyVersion.length() > 0) {
+			List<DataDict> dictionaries = getDictionaries(studyVersion);
+			for (DataDict dict : dictionaries) {
+				 schemas.add(new Schema(dict.getDictFullName(), dict.getVersion(),  maintainers, "released"));
+			}
+		}
+		else {
+
+		}
 		return schemas;
 	}
 	  
 
+    private Boolean hasFTP() {
+    	Boolean connected = false;
+    	try {
+			String wd = ftp.printWorkingDirectory();
+			if (wd != null) {
+				connected = true;
+				log.debug("hasFTP: working directory is" + wd);
+			}
+			else {
+				log.debug("hasFTP: pwd returned null");
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			log.debug("hasFTP: caught IOException.");		
+		}
+    	return connected; 
+    }
+    
     private void getFTPClient() {
 
+    	log.info("getting ftp connection");
     	// Create an instance of FTPClient 
         ftp = new FTPClient(); 
         try { 
@@ -258,7 +292,7 @@ public class DbGaPSchemaProvider implements SchemaProvider {
         	//log.info("setting up ftp. log level is " + env.getProperty("logging.level.root"));
         	// Establish a connection with the FTP URL 
             //if (env.getProperty("logging.level.root") == "DEBUG") {
-            	//ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+            //ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
             //}
             ftp.connect(ftpbase); 
             //ftp.connect(ftpbase, port);
@@ -273,6 +307,10 @@ public class DbGaPSchemaProvider implements SchemaProvider {
             // Enter user details : user name and password 
             boolean isSuccess = ftp.login("anonymous", "schemarepo@gmail.com"); 
         }
+        catch (FTPConnectionClosedException e) { 
+        	log.info("FTP Connection closed");
+        	//e.printStackTrace(); 
+        } 
         catch (IOException e) { 
             e.printStackTrace(); 
         } 
@@ -283,13 +321,15 @@ public class DbGaPSchemaProvider implements SchemaProvider {
         String studypath = "/dbgap/studies/" + study;
         String dirName = "";
         try { 
-       		if  (!this.ftp.isConnected()) getFTPClient();
-       		log.info("looking for version folders in " + studypath);
+        	if  (!hasFTP()) {
+    			getFTPClient();
+    		}
+       		log.debug("looking for version folders in " + studypath);
 	        FTPFile[] dirsFTP = ftp.listDirectories(studypath);
-	        log.info("found file count: " + dirsFTP.length);
+	        log.debug("found file count: " + dirsFTP.length);
 	        for (FTPFile dir : dirsFTP) { 
 	            dirName = dir.getName();
-	            log.info("found directory : " + dirName);
+	            log.debug("found directory : " + dirName);
 	            if (dirName.startsWith(studyVersion)) break;
 	        }
         }
@@ -301,4 +341,17 @@ public class DbGaPSchemaProvider implements SchemaProvider {
         }
         return studypath + "/" + dirName + "/pheno_variable_summaries/"; 
     }
+
+	@Override
+	public List<SchemaVersion> getSchemaVersions(String schema) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getReturnTypes() {
+		List<String> returnTypes = Arrays.asList("application/schema+json", "application/xml+data_dict");
+		return returnTypes;
+	}
+
 } 

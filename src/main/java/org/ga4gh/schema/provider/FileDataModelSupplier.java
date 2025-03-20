@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ga4gh.schema.model.Schema;
+import org.ga4gh.schema.model.SchemaVersion;
 
 import com.dnastack.ga4gh.dataconnect.DataModelSupplier;
 import com.dnastack.ga4gh.dataconnect.model.DataModel;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 //@Configuration
 //@ConfigurationProperties("app.file-datamodel-supplier")
-public class FileDataModelSupplier implements DataModelSupplier, SchemaProvider {
+public class FileDataModelSupplier extends BaseSchemaProvider implements DataModelSupplier, SchemaProvider {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -100,4 +101,16 @@ public class FileDataModelSupplier implements DataModelSupplier, SchemaProvider 
         }
         return model;
 	}
+
+	@Override
+	public List<SchemaVersion> getSchemaVersions(String schema) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*@Override
+	public List<String> getReturnTypes() {
+		List<String> returnTypes = Arrays.asList("json");
+		return returnTypes;
+	}*/
 }
